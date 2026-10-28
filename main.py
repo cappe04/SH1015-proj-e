@@ -4,13 +4,14 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-with fits.open("data/fits/jw01232-o003_t001_nirspec_g395m-f290lp_s3d.fits") as file:
+with fits.open("data/fits/jw03131-o001_t001_nirspec_g140h-f100lp_s3d.fits") as file:
     hdu = file[1]
     wcs = WCS(hdu.header).spectral
 
     data = np.array(hdu.data, dtype=np.float32)
 
     spectral_axis = wcs.pixel_to_world_values(np.arange(data.shape[0])) * 1e6 # micrometer
+    spectral_axis = np.nan_to_num(spectral_axis)
 
 
 class Background:
@@ -26,6 +27,7 @@ def get_image(layer: int):
 
 def get_spectrum(x, y):
     spec = data[:, y-1, x-1]
+    spec = np.nan_to_num(spec)
 
     bg = Background(spec)
     return spec, bg
@@ -59,8 +61,14 @@ def fit_normal(spec, background: Background, spec_slice):
     return mu, std, a, fn
 
 # spec_slice = spectrum_slice(4.04, 4.08)
-spec_slice = spectrum_slice(4.15, 4.20)
-spec, background = get_spectrum(28, 23)
+
+x, y = 32, 23
+image = 302
+
+print(spectrum_index(1.08332))
+
+spec_slice = spectrum_slice(1.08, 1.09)
+spec, background = get_spectrum(x, y)
 
 # X, Y = load_ascii_spectrum("data/spectral/f290_x28_y23.txt")
 
@@ -75,14 +83,15 @@ mu, std, a, fn = fit_normal(spec, background, spec_slice)
 
 X = spectral_axis[spec_slice]
 Y = spec[spec_slice]
-X_lin = np.linspace(X[0], X[-1], 100)
+X_lin = np.linspace(X[0], X[-1], 1000)
 
+print(mu, std)
 
-plt.title(f"Image 1001 - {spectral_axis[1000]:.3f} $\\mu m$")
-plt.imshow(get_image(1001), cmap="afmhot")
-plt.show()
+# plt.title(f"Image {image} - {spectral_axis[image-1]:.3f} $\\mu m$")
+# plt.imshow(get_image(image), cmap="afmhot")
+# plt.show()
 
-plt.title("Spectrum of pixel (28, 23)")
+plt.title(f"Spectrum of pixel ({x}, {y})")
 plt.xlabel("$\\lambda$ [$\\mu$m]")
 plt.ylabel("[MJy/sr]")
 plt.plot(X, Y)
