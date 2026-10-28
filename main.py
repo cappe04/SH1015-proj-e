@@ -6,11 +6,9 @@ import matplotlib.pyplot as plt
 
 with fits.open("data/fits/jw01232-o003_t001_nirspec_g395m-f290lp_s3d.fits") as file:
     hdu = file[1]
-    
     wcs = WCS(hdu.header).spectral
 
     data = np.array(hdu.data, dtype=np.float32)
-    data = np.flip(data, axis=1)
 
     spectral_axis = wcs.pixel_to_world_values(np.arange(data.shape[0])) * 1e6 # micrometer
 
@@ -24,10 +22,11 @@ class Background:
         return self.k * x + self.m
 
 def get_image(layer: int):
-    return data[layer+1, :, :]
+    return data[layer-1, :, :]
 
 def get_spectrum(x, y):
-    spec = data[:, x+1, y+1]
+    spec = data[:, y-1, x-1]
+
     bg = Background(spec)
     return spec, bg
 
@@ -59,11 +58,18 @@ def fit_normal(spec, background: Background, spec_slice):
 
     return mu, std, a, fn
 
-def eval_normal(x, a, mu, sigma):
-    return a * np.exp(-(x - mu)**2 / (2 * sigma**2))
-
-spec_slice = spectrum_slice(4.04, 4.08)
+# spec_slice = spectrum_slice(4.04, 4.08)
+spec_slice = spectrum_slice(4.15, 4.20)
 spec, background = get_spectrum(28, 23)
+
+# X, Y = load_ascii_spectrum("data/spectral/f290_x28_y23.txt")
+
+# plt.plot(X, Y)
+# plt.plot(spectral_axis, spec)
+# plt.plot(spectral_axis, background.eval(spectral_axis))
+# plt.show()
+
+# quit()
 
 mu, std, a, fn = fit_normal(spec, background, spec_slice)
 
@@ -81,6 +87,7 @@ plt.xlabel("$\\lambda$ [$\\mu$m]")
 plt.ylabel("[MJy/sr]")
 plt.plot(X, Y)
 plt.plot(X_lin, fn(X_lin))
+plt.plot(X_lin, background.eval(X_lin))
 plt.legend(["Raw data", "Normal fit"])
 plt.show()
 
