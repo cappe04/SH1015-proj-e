@@ -109,6 +109,20 @@ plt.plot(X_lin, background.eval(X_lin))
 plt.legend(["Raw data", "Normal fit"])
 plt.show()
 
-
-
-
+def speed_from_doppler(wl_ref, wl_measured, mps = True):
+    """Returns the speed of a pixel based on the shift of wavelength. Stadard v [m/s], option v/c.
+    Rounds to lowest sig fig"""
+    c = 299792458
+    sigfig = min(len(str(wl_ref))-1, len(str(wl_measured))-1)
+    v = c*(wl_measured**2 - wl_ref**2) / (wl_ref**2 + wl_measured**2)
+    integers = len(str(round(v)))
+    if mps == True: 
+        print(mps)
+        return round(v, sigfig - integers) 
+    else: 
+        n = 0
+        while int(v/c) == 0:
+            print(v/c)
+            v = v * 10
+            n += 1
+        return round(v/c / 10**n , n + sigfig)
