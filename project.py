@@ -2,16 +2,28 @@ from astropy.io import fits
 from astropy.wcs import WCS
 import numpy as np
 
-import matplotlib.pyplot as plt
+data: np.ndarray[np.float32]
+spectral_axis: np.ndarray[np.float32]
 
+<<<<<<< HEAD:main.py
 with fits.open("data/fits/jw03131-o001_t001_nirspec_g140h-f100lp_s3d.fits") as file:
     hdu = file[1] # SCI data
     wcs = WCS(hdu.header).spectral
+=======
+>>>>>>> f9d088e41c40b239f5314396ca96bd7ae135c030:project.py
 
-    data = np.array(hdu.data, dtype=np.float32)
+def load_data(path):
+    global data
+    global spectral_axis
 
-    spectral_axis = wcs.pixel_to_world_values(np.arange(data.shape[0])) * 1e6 # micrometer
-    spectral_axis = np.nan_to_num(spectral_axis)
+    with fits.open(path) as file:
+        hdu = file[1]
+        wcs = WCS(hdu.header).spectral
+
+        data = np.array(hdu.data, dtype=np.float32)
+
+        spectral_axis = wcs.pixel_to_world_values(np.arange(data.shape[0])) * 1e6 # micrometer
+        spectral_axis = np.nan_to_num(spectral_axis)
 
 
 class Background:
@@ -68,6 +80,7 @@ def fit_normal(spec, background: Background, spec_slice):
         return a * np.exp(-(x - mu)**2 / (2 * std**2)) + background.eval(x)
 
     return mu, std, a, fn
+<<<<<<< HEAD:main.py
 
 # spec_slice = spectrum_slice(4.04, 4.08)
 
@@ -126,3 +139,5 @@ def speed_from_doppler(wl_ref, wl_measured, mps = True):
             v = v * 10
             n += 1
         return round(v/c / 10**n , n + sigfig)
+=======
+>>>>>>> f9d088e41c40b239f5314396ca96bd7ae135c030:project.py
