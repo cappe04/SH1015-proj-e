@@ -5,12 +5,6 @@ import numpy as np
 data: np.ndarray[np.float32]
 spectral_axis: np.ndarray[np.float32]
 
-<<<<<<< HEAD:main.py
-with fits.open("data/fits/jw03131-o001_t001_nirspec_g140h-f100lp_s3d.fits") as file:
-    hdu = file[1] # SCI data
-    wcs = WCS(hdu.header).spectral
-=======
->>>>>>> f9d088e41c40b239f5314396ca96bd7ae135c030:project.py
 
 def load_data(path):
     global data
@@ -23,13 +17,15 @@ def load_data(path):
         data = np.array(hdu.data, dtype=np.float32)
 
         spectral_axis = wcs.pixel_to_world_values(np.arange(data.shape[0])) * 1e6 # micrometer
-        spectral_axis = np.nan_to_num(spectral_axis)
+        # spectral_axis = np.nan_to_num(spectral_axis)
 
 
 class Background:
     def __init__(self, spec):
         """Linear fit of all wavelengths. Pixel specific."""
-        self.k, self.m = np.polyfit(spectral_axis, spec, 1)
+        idx = np.isfinite(spectral_axis) & np.isfinite(spec)
+
+        self.k, self.m = np.polyfit(spectral_axis[idx], spec[idx], 1)
         self.data = self.k * spectral_axis + self.m
 
     def eval(self, x):
@@ -44,7 +40,10 @@ def get_spectrum(x, y):
     """Gets spectrum from pixel (x, y). Same for all layers!
     Returns spectrum and background"""
     spec = data[:, y-1, x-1]
-    spec = np.nan_to_num(spec)
+    # spec = np.nan_to_num(spec)
+
+    if np.isfinite(spec).sum() == 0:
+        return spec, None
 
     bg = Background(spec)
     return spec, bg
@@ -70,7 +69,7 @@ def fit_normal(spec, background: Background, spec_slice):
     X = spectral_axis[spec_slice]
     Y = spec[spec_slice]
 
-    correct_Y = np.clip(Y - background.data[spec_slice], 0, None)
+    correct_Y = np.clip(Y - background.eval(X), 0, None)
 
     mu = np.average(X, weights=correct_Y)
     std = np.sqrt(np.average((X - mu)**2, weights=correct_Y))
@@ -80,47 +79,6 @@ def fit_normal(spec, background: Background, spec_slice):
         return a * np.exp(-(x - mu)**2 / (2 * std**2)) + background.eval(x)
 
     return mu, std, a, fn
-<<<<<<< HEAD:main.py
-
-# spec_slice = spectrum_slice(4.04, 4.08)
-
-x, y = 32, 23
-image = 302
-
-print(spectrum_index(1.08332))
-
-spec_slice = spectrum_slice(1.08, 1.09)
-spec, background = get_spectrum(x, y)
-
-# X, Y = load_ascii_spectrum("data/spectral/f290_x28_y23.txt")
-
-# plt.plot(X, Y)
-# plt.plot(spectral_axis, spec)
-# plt.plot(spectral_axis, background.eval(spectral_axis))
-# plt.show()
-
-# quit()
-
-mu, std, a, fn = fit_normal(spec, background, spec_slice)
-
-X = spectral_axis[spec_slice]
-Y = spec[spec_slice]
-X_lin = np.linspace(X[0], X[-1], 1000)
-
-print(mu, std)
-
-# plt.title(f"Image {image} - {spectral_axis[image-1]:.3f} $\\mu m$")
-# plt.imshow(get_image(image), cmap="afmhot")
-# plt.show()
-
-plt.title(f"Spectrum of pixel ({x}, {y})")
-plt.xlabel("$\\lambda$ [$\\mu$m]")
-plt.ylabel("[MJy/sr]")
-plt.plot(X, Y)
-plt.plot(X_lin, fn(X_lin))
-plt.plot(X_lin, background.eval(X_lin))
-plt.legend(["Raw data", "Normal fit"])
-plt.show()
 
 def speed_from_doppler(wl_ref, wl_measured, mps = True):
     """Returns the speed of a pixel based on the shift of wavelength. Stadard v [m/s], option v/c.
@@ -139,5 +97,3 @@ def speed_from_doppler(wl_ref, wl_measured, mps = True):
             v = v * 10
             n += 1
         return round(v/c / 10**n , n + sigfig)
-=======
->>>>>>> f9d088e41c40b239f5314396ca96bd7ae135c030:project.py
