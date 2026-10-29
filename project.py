@@ -2,16 +2,22 @@ from astropy.io import fits
 from astropy.wcs import WCS
 import numpy as np
 
-import matplotlib.pyplot as plt
+data: np.ndarray[np.float32]
+spectral_axis: np.ndarray[np.float32]
 
-with fits.open("data/fits/jw03131-o001_t001_nirspec_g140h-f100lp_s3d.fits") as file:
-    hdu = file[1]
-    wcs = WCS(hdu.header).spectral
 
-    data = np.array(hdu.data, dtype=np.float32)
+def load_data(path):
+    global data
+    global spectral_axis
 
-    spectral_axis = wcs.pixel_to_world_values(np.arange(data.shape[0])) * 1e6 # micrometer
-    spectral_axis = np.nan_to_num(spectral_axis)
+    with fits.open(path) as file:
+        hdu = file[1]
+        wcs = WCS(hdu.header).spectral
+
+        data = np.array(hdu.data, dtype=np.float32)
+
+        spectral_axis = wcs.pixel_to_world_values(np.arange(data.shape[0])) * 1e6 # micrometer
+        spectral_axis = np.nan_to_num(spectral_axis)
 
 
 class Background:
@@ -59,47 +65,3 @@ def fit_normal(spec, background: Background, spec_slice):
         return a * np.exp(-(x - mu)**2 / (2 * std**2)) + background.eval(x)
 
     return mu, std, a, fn
-
-# spec_slice = spectrum_slice(4.04, 4.08)
-
-x, y = 32, 23
-image = 302
-
-print(spectrum_index(1.08332))
-
-spec_slice = spectrum_slice(1.08, 1.09)
-spec, background = get_spectrum(x, y)
-
-# X, Y = load_ascii_spectrum("data/spectral/f290_x28_y23.txt")
-
-# plt.plot(X, Y)
-# plt.plot(spectral_axis, spec)
-# plt.plot(spectral_axis, background.eval(spectral_axis))
-# plt.show()
-
-# quit()
-
-mu, std, a, fn = fit_normal(spec, background, spec_slice)
-
-X = spectral_axis[spec_slice]
-Y = spec[spec_slice]
-X_lin = np.linspace(X[0], X[-1], 1000)
-
-print(mu, std)
-
-# plt.title(f"Image {image} - {spectral_axis[image-1]:.3f} $\\mu m$")
-# plt.imshow(get_image(image), cmap="afmhot")
-# plt.show()
-
-plt.title(f"Spectrum of pixel ({x}, {y})")
-plt.xlabel("$\\lambda$ [$\\mu$m]")
-plt.ylabel("[MJy/sr]")
-plt.plot(X, Y)
-plt.plot(X_lin, fn(X_lin))
-plt.plot(X_lin, background.eval(X_lin))
-plt.legend(["Raw data", "Normal fit"])
-plt.show()
-
-
-
-
