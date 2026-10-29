@@ -17,7 +17,6 @@ def load_data(path):
         data = np.array(hdu.data, dtype=np.float32)
 
         spectral_axis = wcs.pixel_to_world_values(np.arange(data.shape[0])) * 1e6 # micrometer
-        # spectral_axis = np.nan_to_num(spectral_axis)
 
 
 class Background:
@@ -40,7 +39,6 @@ def get_spectrum(x, y):
     """Gets spectrum from pixel (x, y). Same for all layers!
     Returns spectrum and background"""
     spec = data[:, y-1, x-1]
-    # spec = np.nan_to_num(spec)
 
     if np.isfinite(spec).sum() == 0:
         return spec, None
@@ -88,12 +86,12 @@ def speed_from_doppler(wl_ref, wl_measured, mps = True):
     v = c*(wl_measured**2 - wl_ref**2) / (wl_ref**2 + wl_measured**2)
     integers = len(str(round(v)))
     if mps == True: 
-        print(mps)
+        # print(mps)
         return round(v, sigfig - integers) 
     else: 
         n = 0
         while int(v/c) == 0:
-            print(v/c)
+            # print(v/c)
             v = v * 10
             n += 1
         return round(v/c / 10**n , n + sigfig)
