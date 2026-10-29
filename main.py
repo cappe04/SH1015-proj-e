@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 with fits.open("data/fits/jw03131-o001_t001_nirspec_g140h-f100lp_s3d.fits") as file:
-    hdu = file[1]
+    hdu = file[1] # SCI data
     wcs = WCS(hdu.header).spectral
 
     data = np.array(hdu.data, dtype=np.float32)
@@ -16,16 +16,21 @@ with fits.open("data/fits/jw03131-o001_t001_nirspec_g140h-f100lp_s3d.fits") as f
 
 class Background:
     def __init__(self, spec):
+        """Linear fit of all wavelengths. Pixel specific."""
         self.k, self.m = np.polyfit(spectral_axis, spec, 1)
         self.data = self.k * spectral_axis + self.m
 
     def eval(self, x):
+        """Returns the background level at a sepcific wavelength x."""
         return self.k * x + self.m
 
 def get_image(layer: int):
+    """One 2D image corresponding to a specific layer. One wavelength."""
     return data[layer-1, :, :]
 
 def get_spectrum(x, y):
+    """Gets spectrum from pixel (x, y). Same for all layers!
+    Returns spectrum and background"""
     spec = data[:, y-1, x-1]
     spec = np.nan_to_num(spec)
 
@@ -33,6 +38,7 @@ def get_spectrum(x, y):
     return spec, bg
 
 def load_ascii_spectrum(path):
+    """"""
     with open(path, "r") as file:
         spec = np.array(file.read().split(), dtype=np.float32)
         spec = np.reshape(spec, (len(spec)//2, 2))
@@ -40,12 +46,15 @@ def load_ascii_spectrum(path):
     return spec[:, 0], spec[:, 1]
 
 def spectrum_index(value):
+    """Returns the layer closest to a desired wavelength?"""
     return np.abs(spectral_axis - value).argmin()
 
 def spectrum_slice(from_, to):
+    """Slices a spectrum. Takes wavelength interval, returns layer interval."""
     return slice(spectrum_index(from_), spectrum_index(to)+1)
 
 def fit_normal(spec, background: Background, spec_slice):
+    """Fits a normal curve to a spectrum. The spectrum should be sliced to only contain one peak."""
     X = spectral_axis[spec_slice]
     Y = spec[spec_slice]
 
