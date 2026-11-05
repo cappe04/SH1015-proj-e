@@ -95,3 +95,14 @@ def speed_from_doppler(wl_ref, wl_measured, mps = True):
             v = v * 10
             n += 1
         return round(v/c / 10**n , n + sigfig)
+
+def pixel_to_deg(path="data/fits/jw03131-o001_t001_nirspec_g140h-f100lp_s3d.fits"):
+    """Reads the mean value of the angle that each pixel spans."""
+    with fits.open(path) as file:
+        hdu = file[1]
+        wcs = WCS(hdu.header)
+        x_pixel_scale_deg = wcs.proj_plane_pixel_scales()[0].value
+        y_pixel_scale_deg = wcs.proj_plane_pixel_scales()[1].value
+        pixel_scale_deg = (x_pixel_scale_deg + y_pixel_scale_deg) / 2
+
+    return pixel_scale_deg
