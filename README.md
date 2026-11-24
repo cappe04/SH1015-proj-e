@@ -4,10 +4,10 @@ Våran handlerade använde [<u>QFitsView</u>](https://www.mpe.mpg.de/~ott/QFitsV
 
 
 ## Kör koden
-För att köra koden behöver du `numpy`, `astropy`, `matplotlib`. Du kan ladda ner de genom att köra följande kommando:
+För att köra koden behöver du `numpy`, `astropy`, `matplotlib`, `opencv-python`. Du kan ladda ner de genom att köra följande kommando:
 
 ```
-python -m pip install numpy matplotlib astropy
+python -m pip install numpy matplotlib astropy opencv-python
 ```
 
 Om det inte fungerar måste du lägga till python som [<u>miljövariabel</u>](https://chatgpt.com/).
