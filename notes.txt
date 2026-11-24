@@ -1,0 +1,46 @@
+        WCS parameters                                                          
+                                                                                
+WCSAXES =                    3 / number of World Coordinate System axes         
+CRPIX1  =                 25.0 / Axis 1 pixel coordinate of ref point, 1-indexed
+CRPIX2  =                 27.0 / Axis 2 pixel coordinate of ref point, 1-indexed
+CRPIX3  =                  1.0 / Axis 3 pixel coordinate of ref point, 1-indexed
+CRVAL1  =         83.866604983 / Axis 1 coordinate value at reference point     
+CRVAL2  =         -69.26975392 / Axis 2 coordinate value at reference point     
+CRVAL3  =   0.9701175286099897 / Axis 3 coordinate value at reference point     
+CTYPE1  = 'RA---TAN'           / Axis 1 type                                    
+CTYPE2  = 'DEC--TAN'           / Axis 2 type                                    
+CTYPE3  = 'WAVE    '           / Axis 3 type                                    
+CUNIT1  = 'deg     '           / Axis 1 units                                   
+CUNIT2  = 'deg     '           / Axis 2 units                                   
+CUNIT3  = 'um      '           / Axis 3 units                                   
+CDELT1  = 2.77777781916989E-05 / Axis 1 coordinate increment at reference point 
+CDELT2  = 2.77777781916989E-05 / Axis 2 coordinate increment at reference point 
+CDELT3  = 0.000234999999520368 / Axis 3 coordinate increment at reference point 
+PC1_1   =                 -1.0 / Linear transformation matrix element           
+PC1_2   =                  0.0 / Linear transformation matrix element           
+PC1_3   =                    0 / Linear transformation matrix element           
+PC2_1   =                  0.0 / Linear transformation matrix element           
+PC2_2   =                  1.0 / Linear transformation matrix element           
+PC2_3   =                    0 / Linear transformation matrix element           
+PC3_1   =                    0 / Linear transformation matrix element           
+PC3_2   =                    0 / Linear transformation matrix element           
+PC3_3   =                    1 / Linear transformation matrix element           
+S_REGION= 'POLYGON ICRS  83.864721514 -69.270476132 83.864721514 &'             
+CONTINUE  '-69.269031688 83.868488452 -69.269031688 83.868488452 &'             
+CONTINUE  '-69.270476132&'                                                      
+CONTINUE  '' / Spatial footprint of the observation                             
+WAVSTART=              9.7E-07 / Lower bound of the default wavelength range    
+WAVEND  =             1.89E-06 / Upper bound of the default wavelength range    
+DISPAXIS=                    1 / Dispersion direction                           
+SPORDER =                   -1 / Spectral order number                          
+VELOSYS =              -533.35 / [m/s] Barycentric correction to radial velocity
+SPECSYS = 'BARYCENT'           / Spectral reference frame                       
+EXTVER  =                    1 / extension value                                
+END                                                  
+
+
+
+Each pixel covers 2.77777781916989E-05 degrees. The "diameter" is 18.7 pixles, 0.0005277777856422791 degrees.
+Small angle => sin(V * pi/180) = diameter
+Distance to SN: 168 000 ly (Wikipedia)
+Assume right angle, multiply by distance gives diameter of 1.523 ly.
